@@ -6,7 +6,7 @@ type Msg = { role: "user" | "assistant"; text: string };
 
 export default function Page() {
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", text: "สวัสดีครับ พิมพ์ข้อความเพื่อเริ่มแชทได้เลย" },
+    { role: "assistant", text: "สวัสดีจ้าว มีหยังหื้อจ่วยก่อ? ✨" },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -42,50 +42,74 @@ export default function Page() {
       });
 
       const data = await res.json();
-      const reply = data?.reply ?? "ขออภัย ระบบไม่สามารถตอบได้ในขณะนี้";
+      const reply = data?.reply ?? "สุมมาเตอะ บ่ฮู้ ตอบไม่ได้เลย";
       setMessages((m) => [...m, { role: "assistant", text: reply }]);
     } catch {
-      setMessages((m) => [...m, { role: "assistant", text: "เกิดข้อผิดพลาดในการเชื่อมต่อ" }]);
+      setMessages((m) => [...m, { role: "assistant", text: "อุ๊ย! การเชื่อมต่อขัดข้องจ้าว ย่ะใหม่เด้อ" }]);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main className="min-h-screen p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">MVP Web Chat (Next.js → n8n → Gemini)</h1>
+    <main className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* หัวข้อสไตล์มินิมอล */}
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold text-pink-500 drop-shadow-sm">
+          🎀 Web Chat CRM (Next.js → n8n → Model Gemini 1.5 Flash) 🎀
+        </h1>
+        <p className="text-purple-400 text-sm font-medium">พี่เคียนคนเมืองแต้ๆ</p>
+      </div>
 
-      <div className="border rounded p-4 h-[60vh] overflow-auto space-y-3 bg-white">
-        {messages.map((m, i) => (
-          <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-            <div className="inline-block max-w-[80%] rounded px-3 py-2 border">
-              <div className="text-xs opacity-60 mb-1">{m.role}</div>
+      {/* กล่องแชทหลัก (Class จาก globals.css ที่เราเจนใหม่) */}
+      <div className="chat-container">
+        
+        {/* พื้นที่แสดงข้อความ */}
+        <div className="messages-area">
+          {messages.map((m, i) => (
+            <div 
+              key={i} 
+              className={m.role === "user" ? "bubble-user" : "bubble-assistant"}
+            >
+              <span className="label">
+                {m.role === "user" ? "Me" : "อ้าย เจมินาย ✨"}
+              </span>
               <div className="whitespace-pre-wrap">{m.text}</div>
             </div>
-          </div>
-        ))}
+          ))}
+          
+          {/* สถานะตอนกำลังพิมพ์ */}
+          {busy && (
+            <div className="bubble-assistant italic animate-pulse">
+              กะลังพิมพ์รอกำ... ☁️
+            </div>
+          )}
+        </div>
+
+        {/* ช่องพิมพ์ข้อความเส้นประ */}
+        <div className="input-area">
+          <input
+            className="input-field"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder="พิมพ์อู้กับเปิ้ลตรงนี้ได้เลย..."
+            disabled={busy}
+          />
+          <button
+            className="send-btn"
+            onClick={send}
+            disabled={busy || !input.trim()}
+            title="ส่งความรัก"
+          >
+            {/* ตัวอักษรตรงนี้จะถูกทับด้วยรูปหัวใจใน CSS ::before */}
+          </button>
+        </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
-        <input
-          className="flex-1 border rounded px-3 py-2"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          placeholder="พิมพ์ข้อความ..."
-          disabled={busy}
-        />
-        <button
-          className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-          onClick={send}
-          disabled={busy}
-        >
-          Send
-        </button>
-      </div>
-
-      <div className="text-sm text-gray-600 mt-2">
-        Session: {sessionId} {busy ? " | กำลังคิด..." : ""}
+      {/* Footer เล็กๆ */}
+      <div className="text-[10px] text-pink-300 mt-6 tracking-widest uppercase">
+        Session ID: {sessionId}
       </div>
     </main>
   );

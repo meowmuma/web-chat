@@ -1,26 +1,168 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* โทนสีหลัก */
+  --background-overlay: rgba(255, 245, 247, 0.4); 
+  --foreground: #5d4d5d; 
+  
+  /* สีพาสเทลสำหรับกรอบข้อความ (สีเดียว ไม่ไล่สี) */
+  --user-bubble-bg: #fbcfe8; /* ชมพูพาสเทลหวานๆ */
+  --user-bubble-text: #5d4d5d;
+  
+  --bot-bubble-bg: #ffffff;
+  --bot-bubble-text: #4b5563;
+  --bot-bubble-border: #f3e8ff;
+
+  /* สีปุ่มกด */
+  --btn-bg: #d8b4fe; /* ม่วงพาสเทล */
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--background-overlay);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Kanit", "Prompt", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ปรับแต่ง Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #fbcfe8;
+  border-radius: 10px;
 }
 
 body {
-  background: var(--background);
+  /* --- ส่วนพื้นหลังรูปภาพ --- */
+  /* หมายเหตุ: เปลี่ยนชื่อไฟล์ให้ตรงกับที่คุณเซฟไว้ในโฟลเดอร์ public นะครับ */
+  background-image: url('/image_c11283.png'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Chat Layout --- */
+
+.chat-container {
+  background: rgba(255, 255, 255, 0.6); /* กระจกใสๆ เห็นพื้นหลัง */
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 30px;
+  box-shadow: 0 15px 35px rgba(236, 72, 153, 0.1);
+  padding: 24px;
+  max-width: 650px;
+  width: 95%;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* กรอบข้อความ Assistant (ฝั่งซ้าย) */
+.bubble-assistant {
+  align-self: flex-start;
+  background-color: var(--bot-bubble-bg);
+  color: var(--bot-bubble-text);
+  padding: 12px 18px;
+  border-radius: 20px 20px 20px 5px;
+  border: 1px solid var(--bot-bubble-border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  max-width: 85%;
+  font-size: 0.95rem;
+}
+
+.bubble-assistant .label {
+  font-size: 0.7rem;
+  color: #a855f7;
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* กรอบข้อความ User (ฝั่งขวา) */
+.bubble-user {
+  align-self: flex-end;
+  background-color: var(--user-bubble-bg); /* สีพาสเทลเดี่ยว */
+  color: var(--user-bubble-text);
+  padding: 12px 18px;
+  border-radius: 20px 20px 5px 20px;
+  box-shadow: 0 4px 12px rgba(251, 207, 232, 0.4);
+  max-width: 85%;
+  font-size: 0.95rem;
+}
+
+.bubble-user .label {
+  display: none;
+}
+
+/* ส่วนกรอกข้อความ */
+.input-area {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 50px;
+  border: 1.5px solid #fce7f3;
+}
+
+.input-field {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 15px;
+  background: transparent;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+}
+
+.send-btn {
+  background-color: var(--btn-bg);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0 25px;
+  height: 45px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(216, 180, 254, 0.4);
+}
+
+.send-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.send-btn:active {
+  transform: translateY(0);
+}
+
+.label {
+  /* display: none;  <-- ลบบรรทัดนี้ออก หรือใส่ comment ไว้แบบนี้ */
+  display: block; /* ให้แสดงกลับมา */
+  font-size: 0.7rem; /* ขนาดตัวหนังสือเล็กๆ */
+  margin-bottom: 4px; /* เว้นระยะห่างจากข้อความนิดหน่อย */
+  color: #a855f7; /* สีม่วงพิกเซล */
+  font-family: var(--font-pixel); /* ใช้ฟอนต์พิกเซลสำหรับ label */
 }
