@@ -102,7 +102,7 @@ export default function Page() {
             disabled={busy || !input.trim()}
             title="ส่งความรัก"
           >
-            {/* ตัวอักษรตรงนี้จะถูกทับด้วยรูปหัวใจใน CSS ::before */}
+            ❤
           </button>
         </div>
       </div>
