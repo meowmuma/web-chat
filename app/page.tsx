@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -11,14 +11,19 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const sessionId = useMemo(() => {
-    if (typeof window === "undefined") return "demo";
+  // ✅ แก้ hydration ตรงนี้
+  const [sessionId, setSessionId] = useState("demo");
+
+  useEffect(() => {
     const key = "session_id";
     const existing = localStorage.getItem(key);
-    if (existing) return existing;
-    const id = crypto.randomUUID();
-    localStorage.setItem(key, id);
-    return id;
+    if (existing) {
+      setSessionId(existing);
+    } else {
+      const id = crypto.randomUUID();
+      localStorage.setItem(key, id);
+      setSessionId(id);
+    }
   }, []);
 
   async function send() {
@@ -42,10 +47,13 @@ export default function Page() {
       });
 
       const data = await res.json();
-      const reply = data?.reply ?? "สุมมาเตอะ บ่ฮู้ ตอบไม่ได้เลย";
+      const reply = data?.reply ?? "สุมมาเตอะ บ่ฮู้ ตอบบ่าได้เลย";
       setMessages((m) => [...m, { role: "assistant", text: reply }]);
     } catch {
-      setMessages((m) => [...m, { role: "assistant", text: "อุ๊ย! การเชื่อมต่อขัดข้องจ้าว ย่ะใหม่เด้อ" }]);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", text: "อุ๊ย! การเชื่อมต่อขัดข้องจ้าว ย่ะใหม่เด้อ" },
+      ]);
     } finally {
       setBusy(false);
     }
@@ -53,22 +61,18 @@ export default function Page() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* หัวข้อสไตล์มินิมอล */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-pink-500 drop-shadow-sm">
-          🎀 Web Chat CRM (Next.js → n8n → Model Gemini 1.5 Flash) 🎀
+          🎀 Web Chat CRM (Next.js → n8n → Model Gemini 2.5 Flash) 🎀
         </h1>
         <p className="text-purple-400 text-sm font-medium">พี่เคียนคนเมืองแต้ๆ</p>
       </div>
 
-      {/* กล่องแชทหลัก (Class จาก globals.css ที่เราเจนใหม่) */}
       <div className="chat-container">
-        
-        {/* พื้นที่แสดงข้อความ */}
         <div className="messages-area">
           {messages.map((m, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={m.role === "user" ? "bubble-user" : "bubble-assistant"}
             >
               <span className="label">
@@ -77,8 +81,7 @@ export default function Page() {
               <div className="whitespace-pre-wrap">{m.text}</div>
             </div>
           ))}
-          
-          {/* สถานะตอนกำลังพิมพ์ */}
+
           {busy && (
             <div className="bubble-assistant italic animate-pulse">
               กะลังพิมพ์รอกำ... ☁️
@@ -86,7 +89,6 @@ export default function Page() {
           )}
         </div>
 
-        {/* ช่องพิมพ์ข้อความเส้นประ */}
         <div className="input-area">
           <input
             className="input-field"
@@ -107,7 +109,6 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Footer เล็กๆ */}
       <div className="text-[10px] text-pink-300 mt-6 tracking-widest uppercase">
         Session ID: {sessionId}
       </div>
